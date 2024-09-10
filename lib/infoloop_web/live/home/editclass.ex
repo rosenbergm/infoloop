@@ -5,7 +5,7 @@ defmodule InfoloopWeb.EditClassLive do
 
   def render(assigns) do
     ~H"""
-    <.back navigate={~p"/app/#{@class.id}"}>Zpě t</.back>
+    <.back navigate={~p"/app/#{@class.id}"}>Zpět</.back>
 
     <section class="flex items-center justify-between py-4">
       <h1 class="text-4xl font-bold">Edit class</h1>
@@ -54,6 +54,6 @@ defmodule InfoloopWeb.EditClassLive do
     Class.get_by_id!(class.id)
     |> Class.update!(form_params)
 
-    {:noreply, socket |> redirect(to: ~p"/#{class.id}")}
+    {:noreply, socket |> redirect(to: ~p"/app/#{class.id}")}
   end
 end

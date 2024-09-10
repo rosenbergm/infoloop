@@ -26,7 +26,7 @@ defmodule Infoloop.Points.Class do
       argument :id, :uuid, allow_nil?: false
       get? true
 
-      prepare build(load: [teacher: [:full_name]])
+      prepare build(load: [users: [:full_name], teacher: [:full_name]])
 
       filter expr(id == ^arg(:id))
     end

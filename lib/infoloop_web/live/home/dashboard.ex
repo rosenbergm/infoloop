@@ -5,8 +5,8 @@ defmodule InfoloopWeb.HomeDashboardLive do
 
   def render(assigns) do
     ~H"""
-    <h2 class="mb-2 font-medium">Owned classes</h2>
-    <article class="grid grid-cols-2 gap-2">
+    <h2 :if={length(@o_classes) != 0} class="mb-2 font-medium">Owned classes</h2>
+    <article :if={length(@o_classes) != 0} class="grid grid-cols-2 gap-2">
       <%= for c <- @o_classes do %>
         <.link patch={~p"/app/#{c.id}"}>
           <section class="group border-2 border-black pt-2 flex items-end">

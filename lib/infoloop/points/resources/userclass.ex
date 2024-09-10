@@ -7,13 +7,24 @@ defmodule Infoloop.Points.UserClass do
     repo Infoloop.Repo
   end
 
-  relationships do
-    belongs_to :user, Infoloop.Accounts.User,
-      api: Infoloop.Accounts,
-      primary_key?: true,
-      allow_nil?: false
+  code_interface do
+    define_for Infoloop.Points
+    define :create, action: :create
+  end
 
-    belongs_to :class, Infoloop.Points.Class, primary_key?: true, allow_nil?: false
+  relationships do
+    belongs_to :user, Infoloop.Accounts.User do
+      api Infoloop.Accounts
+      primary_key? true
+      allow_nil? false
+      attribute_writable? true
+    end
+
+    belongs_to :class, Infoloop.Points.Class do
+      primary_key? true
+      allow_nil? false
+      attribute_writable? true
+    end
   end
 
   actions do

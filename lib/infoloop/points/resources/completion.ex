@@ -13,6 +13,10 @@ defmodule Infoloop.Points.Completion do
     define :update, action: :update
     define :destroy, action: :destroy
     define :get_by_id, args: [:id], action: :by_id
+
+    define :get_by_assignment_and_user,
+      args: [:assignment_id, :user_id],
+      action: :by_assignment_and_user
   end
 
   actions do
@@ -22,6 +26,15 @@ defmodule Infoloop.Points.Completion do
       argument :id, :uuid, allow_nil?: false
       get? true
       filter expr(id == ^arg(:id))
+    end
+
+    read :by_assignment_and_user do
+      argument :assignment_id, :uuid, allow_nil?: false
+      argument :user_id, :uuid, allow_nil?: false
+
+      get? true
+
+      filter expr(assignment_id == ^arg(:assignment_id) and user_id == ^arg(:user_id))
     end
   end
 
@@ -36,7 +49,13 @@ defmodule Infoloop.Points.Completion do
   end
 
   relationships do
-    belongs_to :user, Infoloop.Accounts.User, api: Infoloop.Accounts
-    belongs_to :assignment, Infoloop.Points.Assignment
+    belongs_to :user, Infoloop.Accounts.User do
+      api Infoloop.Accounts
+      attribute_writable? true
+    end
+
+    belongs_to :assignment, Infoloop.Points.Assignment do
+      attribute_writable? true
+    end
   end
 end

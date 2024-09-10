@@ -61,10 +61,18 @@ defmodule Infoloop.Accounts.User do
     define :read_all, action: :read
     define :update, action: :update
     define :destroy, action: :destroy
+    define :get_by_email, args: [:email], action: :by_email
   end
 
   actions do
     defaults [:create, :read, :update, :destroy]
+
+    read :by_email do
+      argument :email, :string, allow_nil?: false
+      get? true
+
+      filter expr(email == ^arg(:email))
+    end
   end
 
   actions do

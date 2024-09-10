@@ -45,7 +45,7 @@ defmodule InfoloopWeb.ClassLive do
       <.markdown text={@class.description} />
     </details>
 
-    <article class="grid grid-cols-2 gap-4">
+    <article class="grid grid-cols-2 gap-4 mb-4">
       <section class="flex-1 border-2 border-black px-4 py-2">
         <p>Máte <%= @reached_points %> z <%= @maximum_points %> bodů.</p>
       </section>
@@ -65,18 +65,52 @@ defmodule InfoloopWeb.ClassLive do
       </section>
     </article>
 
+    <article :if={@user.id == @class.teacher_id} class="space-x-4">
+      <.link patch={~p"/app/#{@class.id}/task/add"}>
+        <.icon name="hero-plus" /> Přidat úkol
+      </.link>
+
+      <.link patch={~p"/app/#{@class.id}/students"}>
+        <.icon name="hero-user-plus" /> Přidat studenta
+      </.link>
+    </article>
+
     <.table id="assignments" rows={@asgns}>
-      <:col :let={a} label="Úkol"><%= a.title %></:col>
+      <:col :let={a} label="Úkol">
+        <%= a.title %>
+
+        <span :if={a.bonus} title="Bonusový úkol">
+          <.icon name="hero-star" />
+        </span>
+      </:col>
       <:col :let={a} label="Body">
         <p :if={!a.completion || a.completion.status == :missing}>
-          Neodevzdáno
+          Neodevzdáno (max. <%= a.max_points %> bodů)
         </p>
         <p :if={a.completion} class="font-mono">
           <span class="inline-block w-[3ch]"><%= a.completion.points %></span> / <%= a.max_points %>
         </p>
       </:col>
+
+      <:action :let={a}>
+        <.link
+          :if={@user.id == @class.teacher_id}
+          patch={~p"/app/#{@class.id}/task/#{a.id}/grade"}
+          class="font-normal"
+        >
+          <.icon name="hero-chart-bar-square" /> Mark
+        </.link>
+      </:action>
     </.table>
     """
+  end
+
+  def handle_event("open-grading", %{"assignment" => assignment}, socket) do
+    IO.inspect(assignment)
+
+    show_modal("confirm")
+
+    {:noreply, socket |> assign(:selected_task, assignment)}
   end
 
   def mount(%{"class_id" => id}, session, %{assigns: %{current_user: user}} = socket) do
@@ -86,16 +120,16 @@ defmodule InfoloopWeb.ClassLive do
         {:ok, socket |> put_flash(:error, "Invalid class accessed.") |> redirect(to: ~p"/")}
 
       {:ok, class} ->
+        IO.inspect(user.id)
+
         asgns =
           Assignment
           |> Ash.Query.filter(class_id == ^class.id)
           |> Ash.Query.sort([:inserted_at])
           |> Ash.Query.load(
-            completions: [
-              user:
-                Infoloop.Accounts.User
-                |> Ash.Query.filter(id == ^user.id)
-            ]
+            completions:
+              Infoloop.Points.Completion
+              |> Ash.Query.filter(user_id == ^user.id)
           )
           |> Infoloop.Points.read!()
           |> Enum.map(fn a ->
@@ -103,13 +137,14 @@ defmodule InfoloopWeb.ClassLive do
 
             Map.put(a, :completion, completion)
           end)
-          |> IO.inspect(label: "asgns")
+
+        IO.inspect(Enum.at(asgns, 0).completions)
 
         {count, max_sum} =
           asgns
+          |> Enum.filter(&(not &1.bonus))
           |> Enum.map(& &1.max_points)
           |> then(&{Enum.count(&1), Enum.sum(&1)})
-          |> IO.inspect()
 
         reached_sum =
           asgns
@@ -126,7 +161,8 @@ defmodule InfoloopWeb.ClassLive do
            asgns_count: count,
            reached_points: reached_sum,
            maximum_points: max_sum,
-           needed_points: class.points_needed
+           needed_points: class.points_needed,
+           selected_task: nil
          )}
     end
   end

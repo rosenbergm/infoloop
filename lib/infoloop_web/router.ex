@@ -44,6 +44,9 @@ defmodule InfoloopWeb.Router do
       live "/", HomeDashboardLive
       live "/:class_id", ClassLive
       live "/:class_id/edit", EditClassLive
+      live "/:class_id/students", StudentsLive
+      live "/:class_id/task/add", AddTaskLive
+      live "/:class_id/task/:task_id/grade", MarkAssignmentLive
     end
   end
 

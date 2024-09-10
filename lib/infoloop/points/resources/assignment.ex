@@ -46,6 +46,11 @@ defmodule Infoloop.Points.Assignment do
       allow_nil? false
     end
 
+    attribute :bonus, :boolean do
+      allow_nil? false
+      default false
+    end
+
     create_timestamp :inserted_at
     update_timestamp :updated_at
   end
@@ -53,6 +58,8 @@ defmodule Infoloop.Points.Assignment do
   relationships do
     has_many :completions, Infoloop.Points.Completion
 
-    belongs_to :class, Infoloop.Points.Class
+    belongs_to :class, Infoloop.Points.Class do
+      attribute_writable? true
+    end
   end
 end
