@@ -45,7 +45,10 @@ defmodule InfoloopWeb.ClassLive do
       <.markdown text={@class.description} />
     </details>
 
-    <article class="grid grid-cols-2 gap-4 mb-4">
+    <article
+      :if={@user.id != @class.teacher_id and @maximum_points != 0}
+      class="grid grid-cols-2 gap-4 mb-4"
+    >
       <section class="flex-1 border-2 border-black px-4 py-2">
         <p>Máte <%= @reached_points %> z <%= @maximum_points %> bodů.</p>
       </section>
@@ -113,7 +116,7 @@ defmodule InfoloopWeb.ClassLive do
     {:noreply, socket |> assign(:selected_task, assignment)}
   end
 
-  def mount(%{"class_id" => id}, session, %{assigns: %{current_user: user}} = socket) do
+  def mount(%{"class_id" => id}, _session, %{assigns: %{current_user: user}} = socket) do
     Class.get_by_id(id)
     |> case do
       {:error, _} ->
@@ -137,8 +140,6 @@ defmodule InfoloopWeb.ClassLive do
 
             Map.put(a, :completion, completion)
           end)
-
-        IO.inspect(Enum.at(asgns, 0).completions)
 
         {count, max_sum} =
           asgns

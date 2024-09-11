@@ -5,6 +5,12 @@ defmodule InfoloopWeb.HomeDashboardLive do
 
   def render(assigns) do
     ~H"""
+    <article :if={@current_user.is_admin} class="space-x-4 mb-4">
+      <.link patch={~p"/app/class/add"}>
+        <.icon name="hero-plus" /> Přidat třídu
+      </.link>
+    </article>
+
     <h2 :if={length(@o_classes) != 0} class="mb-2 font-medium">Owned classes</h2>
     <article :if={length(@o_classes) != 0} class="grid grid-cols-2 gap-2">
       <%= for c <- @o_classes do %>

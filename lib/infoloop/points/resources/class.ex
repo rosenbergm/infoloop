@@ -60,7 +60,10 @@ defmodule Infoloop.Points.Class do
   end
 
   relationships do
-    belongs_to :teacher, Infoloop.Accounts.User, api: Infoloop.Accounts
+    belongs_to :teacher, Infoloop.Accounts.User do
+      api Infoloop.Accounts
+      attribute_writable? true
+    end
 
     has_many :users_join_assoc, Infoloop.Points.UserClass, api: Infoloop.Points
 

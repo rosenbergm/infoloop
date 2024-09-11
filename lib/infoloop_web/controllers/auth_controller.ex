@@ -1,9 +1,16 @@
 defmodule InfoloopWeb.AuthController do
+  alias Infoloop.Accounts
+  alias Infoloop.Accounts.User
   use InfoloopWeb, :controller
   use AshAuthentication.Phoenix.Controller
 
   def success(conn, _activity, user, _token) do
     return_to = get_session(conn, :return_to) || ~p"/"
+
+    case Accounts.count!(User) do
+      1 ->
+        User.update!(user, %{"is_admin" => true})
+    end
 
     conn
     |> delete_session(:return_to)

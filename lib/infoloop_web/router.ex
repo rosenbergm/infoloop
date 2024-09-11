@@ -42,6 +42,7 @@ defmodule InfoloopWeb.Router do
     ash_authentication_live_session :dashboard,
       on_mount: [{InfoloopWeb.LiveUserAuth, :live_user_required}] do
       live "/", HomeDashboardLive
+      live "/class/add", AddClassLive
       live "/:class_id", ClassLive
       live "/:class_id/edit", EditClassLive
       live "/:class_id/students", StudentsLive
